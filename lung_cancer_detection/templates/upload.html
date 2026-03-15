@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="glass-card p-4">
+      <h2 class="mb-3">Upload CT Scan</h2>
+      <p class="text-muted">Select a patient and upload a CT scan image for AI analysis.</p>
+      <form method="POST" action="{{ url_for('predict') }}" enctype="multipart/form-data" class="mt-4">
+        <div class="mb-3">
+          <label class="form-label">Patient</label>
+          <select name="patient_id" class="form-select" required>
+            <option value="">Select patient</option>
+            {% for patient in patients %}
+              <option value="{{ patient['id'] }}">{{ patient['patient_id'] }} - {{ patient['name'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">CT Scan Image</label>
+          <input type="file" name="image" class="form-control" accept="image/*" required>
+        </div>
+        <div class="preview-box" id="previewBox">No preview</div>
+        <button type="submit" class="btn btn-primary mt-3 w-100">Run Prediction</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="glass-card p-4 mb-4">
+      <h4 class="mb-3">Scan Quality Checklist</h4>
+      <ul class="list-unstyled small">
+        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Clear lung region visible</li>
+        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Minimal motion blur</li>
+        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Proper contrast & exposure</li>
+        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Correct patient selected</li>
+      </ul>
+    </div>
+    <div class="glass-card p-4 mb-4">
+      <h4 class="mb-3">Clinical Data Reminder</h4>
+      <p class="small text-muted mb-2">Ensure the patient profile includes clinical risk factors before scanning:</p>
+      <ul class="list-unstyled small mb-0">
+        <li class="mb-1"><i class="bi bi-dot"></i> Smoking history and duration</li>
+        <li class="mb-1"><i class="bi bi-dot"></i> Family history and exposure risks</li>
+        <li class="mb-1"><i class="bi bi-dot"></i> Symptoms such as cough and weight loss</li>
+      </ul>
+    </div>
+    <div class="glass-card p-4">
+      <h4 class="mb-3">AI Pipeline</h4>
+      <div class="d-flex align-items-center gap-3">
+        <div class="scan-pulse"></div>
+        <div class="small text-muted">
+          Image is resized to 128x128, normalized, and analyzed by the CNN model.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %}

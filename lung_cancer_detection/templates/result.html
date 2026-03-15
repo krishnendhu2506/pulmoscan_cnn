@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="glass-card p-4">
+      <h3 class="mb-3">Prediction Result</h3>
+      <div class="result-pill {{ result['predicted_class']|lower|replace(' ', '-') }}">
+        {{ result['predicted_class'] }}
+      </div>
+      <div class="mt-3">
+        <p class="mb-1">Confidence</p>
+        <h2>{{ '%.2f'|format(result['confidence']) }}%</h2>
+      </div>
+      <hr>
+      <p class="text-muted">Probability Distribution</p>
+      {% for row in result['prob_rows'] %}
+        <div class="prob-row">
+          <span>{{ row['label'] }}</span>
+          <div class="progress"><div class="progress-bar {{ row['bar_class'] }}" style="width: {{ row['prob'] }}%"></div></div>
+          <span>{{ '%.2f'|format(row['prob']) }}%</span>
+        </div>
+      {% endfor %}
+      <a href="{{ url_for('download_report', prediction_id=result['prediction_id']) }}" class="btn btn-outline-primary w-100 mt-3">Download PDF Report</a>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="glass-card p-4 mb-4">
+      <h4 class="mb-3">Patient Details</h4>
+      <ul class="list-unstyled">
+        <li><strong>ID:</strong> {{ patient['patient_id'] }}</li>
+        <li><strong>Name:</strong> {{ patient['name'] }}</li>
+        <li><strong>Age:</strong> {{ patient['age'] }}</li>
+        <li><strong>Gender:</strong> {{ patient['gender'] }}</li>
+        <li><strong>Smoking History:</strong> {{ patient['smoking_history'] or 'N/A' }}</li>
+        <li><strong>Years of Smoking:</strong> {{ patient['years_of_smoking'] if patient['years_of_smoking'] is not none else 'N/A' }}</li>
+        <li><strong>Family History:</strong> {{ patient['family_history_lung_cancer'] or 'N/A' }}</li>
+        <li><strong>Air Pollution Exposure:</strong> {{ patient['air_pollution_exposure'] or 'N/A' }}</li>
+        <li><strong>Occupational Exposure:</strong> {{ patient['occupational_exposure'] or 'N/A' }}</li>
+        <li><strong>Persistent Cough:</strong> {{ patient['persistent_cough'] or 'N/A' }}</li>
+        <li><strong>Unexplained Weight Loss:</strong> {{ patient['unexplained_weight_loss'] or 'N/A' }}</li>
+      </ul>
+      <div class="scan-preview mt-3">
+        <img src="{{ url_for('static', filename='uploads/' + image_filename) }}" alt="CT Scan" class="img-fluid rounded">
+      </div>
+    </div>
+
+    <div class="glass-card p-4">
+      <h4 class="mb-3">AI Distribution Chart</h4>
+      <canvas id="probChart" height="180"></canvas>
+      <div class="alert alert-warning mt-3">
+        This AI output is a clinical decision support tool and must be reviewed by a qualified specialist.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const probCtx = document.getElementById('probChart');
+  new Chart(probCtx, {
+    type: 'bar',
+    data: {
+      labels: {{ result['chart_labels'] | tojson }},
+      datasets: [{
+        label: 'Probability %',
+        data: {{ result['chart_data'] | tojson }},
+        backgroundColor: {{ result['chart_colors'] | tojson }}
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#1b2a41' }, grid: { color: 'rgba(20,33,61,0.1)' } },
+        x: { ticks: { color: '#1b2a41' }, grid: { color: 'rgba(20,33,61,0.1)' } }
+      },
+      plugins: { legend: { labels: { color: '#1b2a41' } } }
+    }
+  });
+</script>
+{% endblock %}

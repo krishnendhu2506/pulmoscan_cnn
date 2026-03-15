@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="splash" style="--entry-bg: url('{{ url_for('static', filename='images/bg.png') }}');" data-redirect-url="{{ url_for('dashboard') }}">
+  <div class="splash-inner">
+    <img src="{{ url_for('static', filename='images/logoorg.png') }}" alt="PulmoScan AI Logo" class="splash-logo">
+    <h1 class="splash-title">PulmoScan AI</h1>
+    <p class="splash-subtitle">Preparing your workspace…</p>
+    <div class="splash-loader" aria-hidden="true"><span></span></div>
+    <noscript>
+      <div class="mt-4">
+        <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Continue</a>
+      </div>
+    </noscript>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (() => {
+    const el = document.querySelector("[data-redirect-url]");
+    if (!el) return;
+    const redirectUrl = el.dataset.redirectUrl;
+    const delayMs = 2200;
+    window.setTimeout(() => {
+      window.location.replace(redirectUrl);
+    }, delayMs);
+  })();
+</script>
+{% endblock %}

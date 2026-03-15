@@ -1,0 +1,10 @@
+flask
+tensorflow
+opencv-python
+numpy
+pandas
+matplotlib
+scikit-learn
+pillow
+reportlab
+flask-login

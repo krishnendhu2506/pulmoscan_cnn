@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+lung_cancer_detection/.venv/
+
+# Local tooling / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Flask / app secrets
+.env
+.flaskenv
+
+# Logs
+*.log
+
+# Data / artifacts (keep out of git; use downloads or Git LFS if needed)
+dataset/
+dataset_std/
+
+# Generated app outputs
+lung_cancer_detection/static/uploads/
+lung_cancer_detection/static/reports/
+lung_cancer_detection/database/*.db
+*.sqlite
+*.sqlite3
