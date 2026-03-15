@@ -3,6 +3,7 @@ import sqlite3
 import sys
 import uuid
 from datetime import datetime
+from tempfile import gettempdir
 
 import numpy as np
 
@@ -13,7 +14,7 @@ if BASE_DIR not in sys.path:
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename, safe_join
 
 from utils.preprocess import preprocess_image
 from model.predict import load_model_once, predict_image
@@ -22,9 +23,11 @@ from models.patient_model import parse_patient_form
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-UPLOAD_DIR = os.path.join(STATIC_DIR, "uploads")
-REPORT_DIR = os.path.join(STATIC_DIR, "reports")
-DB_PATH = os.path.join(BASE_DIR, "database", "patients.db")
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+RUNTIME_DIR = os.path.join(gettempdir(), "pulmoscan") if IS_VERCEL else BASE_DIR
+UPLOAD_DIR = os.path.join(RUNTIME_DIR, "uploads") if IS_VERCEL else os.path.join(STATIC_DIR, "uploads")
+REPORT_DIR = os.path.join(RUNTIME_DIR, "reports") if IS_VERCEL else os.path.join(STATIC_DIR, "reports")
+DB_PATH = os.path.join(RUNTIME_DIR, "patients.db") if IS_VERCEL else os.path.join(BASE_DIR, "database", "patients.db")
 MODEL_PATH = os.path.join(BASE_DIR, "model", "lung_cancer_model.h5")
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "bmp", "tif", "tiff"}
@@ -335,6 +338,16 @@ def upload():
             (current_user.id,),
         ).fetchall()
     return render_template("upload.html", patients=patients)
+
+
+@app.route("/uploads/<path:filename>")
+@login_required
+def uploaded_file(filename):
+    safe_path = safe_join(UPLOAD_DIR, filename)
+    if not safe_path or not os.path.exists(safe_path):
+        flash("Uploaded file not found.", "warning")
+        return redirect(url_for("history"))
+    return send_file(safe_path)
 
 
 @app.route("/predict", methods=["POST"])

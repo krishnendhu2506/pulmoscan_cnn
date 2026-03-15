@@ -41,7 +41,7 @@
         <li><strong>Unexplained Weight Loss:</strong> {{ patient['unexplained_weight_loss'] or 'N/A' }}</li>
       </ul>
       <div class="scan-preview mt-3">
-        <img src="{{ url_for('static', filename='uploads/' + image_filename) }}" alt="CT Scan" class="img-fluid rounded">
+        <img src="{{ url_for('uploaded_file', filename=image_filename) }}" alt="CT Scan" class="img-fluid rounded">
       </div>
     </div>
 
