@@ -1,6 +1,6 @@
 flask
 tensorflow
-opencv-python
+opencv-python-headless
 numpy
 pandas
 matplotlib
@@ -8,3 +8,4 @@ scikit-learn
 pillow
 reportlab
 flask-login
+gunicorn

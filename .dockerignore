@@ -1,0 +1,16 @@
+.git
+.github
+.vscode
+.idea
+**/__pycache__
+**/*.pyc
+
+dataset
+dataset_std
+
+lung_cancer_detection/.venv
+lung_cancer_detection/static/uploads
+lung_cancer_detection/static/reports
+lung_cancer_detection/database/*.db
+
+*.log
